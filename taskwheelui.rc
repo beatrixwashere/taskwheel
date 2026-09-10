@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gui name="taskwheel"
+     version="1"
+     xmlns="https://www.kde.org/standards/kxmlgui/1.0"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="https://www.kde.org/standards/kxmlgui/1.0
+                         https://www.kde.org/standards/kxmlgui/1.0/kxmlgui.xsd">
+  <MenuBar>
+    <Menu >
+      <text>W&amp;heel</text>
+      <Action name="Spin" />
+      <Action name="Check" />
+      <Action name="Pause" />
+      <Action name="Resume" />
+    </Menu>
+  </MenuBar>
+
+  <ToolBar name="mainToolBar" >
+    <text>Main Toolbar</text>
+    <Action name="Spin" />
+  </ToolBar>
+</gui>
