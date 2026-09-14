@@ -3,12 +3,15 @@
  
 #include <KXmlGuiWindow>
 #include <vector>
+#include "taskentry.h"
 
 class KTextEdit;
 class KJob;
 class QTimer;
 class QCloseEvent;
 class QVBoxLayout;
+class QPushButton;
+class QScrollArea;
 
 class MainWindow : public KXmlGuiWindow {
     Q_OBJECT
@@ -16,9 +19,11 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     void openFileFromUrl(const QUrl& inputFileName);
 private:
+    QScrollArea* taskScroll;
     QWidget* taskList;
     QVBoxLayout* taskLayout;
-    std::vector<QWidget*> taskEntries;
+    std::vector<TaskEntry*> taskEntries;
+    QPushButton* newTask;
     KTextEdit* textArea;
     QString fileName;
     QTimer* taskTime;
@@ -26,6 +31,7 @@ private:
     bool cancelQuit;
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
     void setupActions();
+    void setupWindow();
     void saveFileToDisk(const QString& outputFileName);
     void startTimer();
     void stopTimer();

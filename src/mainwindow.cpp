@@ -9,6 +9,8 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSpinBox>
+#include <QPushButton>
+#include <QScrollArea>
 #include <KTextEdit>
 #include <KLocalizedString>
 #include <KActionCollection>
@@ -19,21 +21,15 @@
 #include <sstream>
 #include <vector>
 #include "mainwindow.h"
+#include "taskentry.h"
 
 MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QString()) {
-    textArea = new KTextEdit();
-    KTextEdit* text2 = new KTextEdit();
-    QHBoxLayout* hblayout = new QHBoxLayout();
-    hblayout->addWidget(textArea);
-    hblayout->addWidget(text2);
-    QWidget* w = new QWidget();
-    w->setLayout(hblayout);
-    w->show();
+    setupWindow();
     taskTime = new QTimer(this);
     secondsLeft = 0;
     cancelQuit = false;
     connect(taskTime, &QTimer::timeout, this, &MainWindow::updateTimer);
-    setCentralWidget(w);
+    setCentralWidget(taskScroll);
     setupActions();
 }
 
@@ -57,6 +53,30 @@ void MainWindow::setupActions() {
     KStandardAction::openNew(this, &MainWindow::newFile, actionCollection());
 
     setupGUI(Default, u"taskwheelui.rc"_s);
+}
+
+void MainWindow::setupWindow() {
+    taskScroll = new QScrollArea();
+    taskList = new QWidget();
+    taskLayout = new QVBoxLayout();
+
+    for(int i = 0; i < 1; i++) {
+        taskEntries.push_back(new TaskEntry());
+        taskLayout->addWidget(taskEntries[i]->container);
+    }
+    newTask = new QPushButton();
+    newTask->setText(i18n("new task"));
+    taskLayout->addWidget(newTask);
+    textArea = new KTextEdit();
+    taskLayout->addWidget(textArea);
+
+    taskList->setLayout(taskLayout);
+    taskList->setMinimumSize(960, 540);
+    taskList->show();
+
+    taskScroll->setWidget(taskList);
+    taskScroll->setAlignment(Qt::AlignHCenter);
+    taskScroll->setWidgetResizable(true);
 }
 
 QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequence keys) {
