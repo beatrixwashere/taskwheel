@@ -14,6 +14,14 @@ TaskEntry::TaskEntry() {
     container->show();
 }
 
+TaskEntry::~TaskEntry() {
+    container->hide();
+    delete container;
+    delete layout;
+    delete taskName;
+    delete taskWeight;
+}
+
 QString TaskEntry::getName() {
     return taskName->text();
 }

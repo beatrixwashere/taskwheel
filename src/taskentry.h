@@ -10,6 +10,7 @@ class QSpinBox;
 class TaskEntry {
 public:
     TaskEntry();
+    ~TaskEntry();
     QWidget* container;
     QString getName();
     int getWeight();

@@ -33,6 +33,19 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QStrin
     setupActions();
 }
 
+MainWindow::~MainWindow() {
+    taskList->hide();
+    delete taskScroll;
+    delete taskList;
+    delete taskLayout;
+    for(TaskEntry* te : taskEntries) {
+        delete te;
+    }
+    delete newTask;
+    delete textArea;
+    delete taskTime;
+}
+
 void MainWindow::setupActions() {
     using namespace Qt::Literals::StringLiterals;
 
@@ -285,6 +298,7 @@ void MainWindow::unsavedChanges() {
 
 void MainWindow::quitApplication() {
     qApp->quit();
+    delete this;
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

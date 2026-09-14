@@ -17,6 +17,7 @@ class MainWindow : public KXmlGuiWindow {
     Q_OBJECT
 public:
     explicit MainWindow(QWidget* parent = nullptr);
+    ~MainWindow();
     void openFileFromUrl(const QUrl& inputFileName);
 private:
     QScrollArea* taskScroll;
