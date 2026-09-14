@@ -32,8 +32,9 @@ add_executable(taskwheel)
 
 target_sources(taskwheel
     PRIVATE
-    main.cpp
-    mainwindow.cpp
+    src/main.cpp
+    src/mainwindow.cpp
+    src/taskentry.cpp
 )
 
 target_link_libraries(taskwheel

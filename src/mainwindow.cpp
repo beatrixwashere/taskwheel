@@ -6,6 +6,9 @@
 #include <QByteArray>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QSpinBox>
 #include <KTextEdit>
 #include <KLocalizedString>
 #include <KActionCollection>
@@ -19,11 +22,18 @@
 
 MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QString()) {
     textArea = new KTextEdit();
+    KTextEdit* text2 = new KTextEdit();
+    QHBoxLayout* hblayout = new QHBoxLayout();
+    hblayout->addWidget(textArea);
+    hblayout->addWidget(text2);
+    QWidget* w = new QWidget();
+    w->setLayout(hblayout);
+    w->show();
     taskTime = new QTimer(this);
     secondsLeft = 0;
     cancelQuit = false;
     connect(taskTime, &QTimer::timeout, this, &MainWindow::updateTimer);
-    setCentralWidget(textArea);
+    setCentralWidget(w);
     setupActions();
 }
 

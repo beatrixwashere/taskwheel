@@ -2,11 +2,13 @@
 #define MAINWINDOW_H
  
 #include <KXmlGuiWindow>
+#include <vector>
 
 class KTextEdit;
 class KJob;
 class QTimer;
 class QCloseEvent;
+class QVBoxLayout;
 
 class MainWindow : public KXmlGuiWindow {
     Q_OBJECT
@@ -14,6 +16,9 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     void openFileFromUrl(const QUrl& inputFileName);
 private:
+    QWidget* taskList;
+    QVBoxLayout* taskLayout;
+    std::vector<QWidget*> taskEntries;
     KTextEdit* textArea;
     QString fileName;
     QTimer* taskTime;
