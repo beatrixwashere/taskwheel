@@ -1,6 +1,8 @@
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QSpinBox>
+#include <QPushButton>
+#include <KLocalizedString>
 #include "taskentry.h"
 
 TaskEntry::TaskEntry() {
@@ -20,6 +22,7 @@ TaskEntry::~TaskEntry() {
     delete layout;
     delete taskName;
     delete taskWeight;
+    delete rmButton;
 }
 
 QString TaskEntry::getName() {

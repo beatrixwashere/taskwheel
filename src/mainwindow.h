@@ -18,7 +18,7 @@ class MainWindow : public KXmlGuiWindow {
 public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
-    void openFileFromUrl(const QUrl& inputFileName);
+    void openFileFromUrl(const QUrl& inputFileName);;
 private:
     QScrollArea* taskScroll;
     QWidget* taskList;
@@ -30,7 +30,10 @@ private:
     QTimer* taskTime;
     int secondsLeft;
     bool cancelQuit;
+    void addTask();
+    void createList(QString text);
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
+    void removeTask(TaskEntry* task);
     void setupActions();
     void setupWindow();
     void saveFileToDisk(const QString& outputFileName);

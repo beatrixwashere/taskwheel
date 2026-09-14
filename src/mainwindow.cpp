@@ -73,15 +73,13 @@ void MainWindow::setupWindow() {
     taskList = new QWidget();
     taskLayout = new QVBoxLayout();
 
-    for(int i = 0; i < 1; i++) {
-        taskEntries.push_back(new TaskEntry());
-        taskLayout->addWidget(taskEntries[i]->container);
-    }
-    newTask = new QPushButton();
-    newTask->setText(i18n("new task"));
-    taskLayout->addWidget(newTask);
+    newTask = new QPushButton(i18n("new task"), this);
+    connect(newTask, &QPushButton::clicked, this, &MainWindow::addTask);
     textArea = new KTextEdit();
+
+    taskLayout->addWidget(newTask);
     taskLayout->addWidget(textArea);
+    addTask();
 
     taskList->setLayout(taskLayout);
     taskList->setMinimumSize(960, 540);
@@ -92,6 +90,15 @@ void MainWindow::setupWindow() {
     taskScroll->setWidgetResizable(true);
 }
 
+void MainWindow::addTask() {
+    TaskEntry* task = new TaskEntry();
+    task->rmButton = new QPushButton(i18n("remove"));
+    connect(task->rmButton, &QPushButton::clicked, this, [this, task]{removeTask(task);});
+    task->layout->addWidget(task->rmButton);
+    taskEntries.push_back(task);
+    taskLayout->insertWidget(taskEntries.size() - 1, task->container);
+}
+
 QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequence keys) {
     QAction* action = new QAction(this);
     action->setText(text);
@@ -99,6 +106,12 @@ QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequ
     actionCollection()->addAction(name, action);
     actionCollection()->setDefaultShortcut(action, keys);
     return action;
+}
+
+void MainWindow::removeTask(TaskEntry* task) {
+    taskEntries.erase(std::find(taskEntries.begin(), taskEntries.end(), task));
+    taskLayout->removeWidget(task->container);
+    delete task;
 }
 
 void MainWindow::checkTimer() {

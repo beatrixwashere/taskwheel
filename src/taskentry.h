@@ -1,21 +1,23 @@
 #ifndef TASKENTRY_H
 #define TASKENTRY_H
 
-#include <KXmlGuiWindow>
+#include <QObject>
 
 class QHBoxLayout;
 class QLineEdit;
 class QSpinBox;
+class QPushButton;
 
 class TaskEntry {
 public:
     TaskEntry();
     ~TaskEntry();
     QWidget* container;
+    QHBoxLayout* layout;
+    QPushButton* rmButton;
     QString getName();
     int getWeight();
 private:
-    QHBoxLayout* layout;
     QLineEdit* taskName;
     QSpinBox* taskWeight;
 };
