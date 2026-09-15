@@ -13,16 +13,19 @@ TaskEntry::TaskEntry() {
     layout->addWidget(taskName);
     layout->addWidget(taskWeight);
     container->setLayout(layout);
+    container->setMinimumSize(960, 30);
     container->show();
 }
 
 TaskEntry::~TaskEntry() {
     container->hide();
+    /*
     delete container;
     delete layout;
     delete taskName;
     delete taskWeight;
     delete rmButton;
+    */
 }
 
 QString TaskEntry::getName() {
@@ -31,4 +34,12 @@ QString TaskEntry::getName() {
 
 int TaskEntry::getWeight() {
     return taskWeight->value();
+}
+
+void TaskEntry::setName(QString text) {
+    return taskName->setText(text);
+}
+
+void TaskEntry::setWeight(int w) {
+    return taskWeight->setValue(w);
 }

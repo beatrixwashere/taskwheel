@@ -17,6 +17,8 @@ public:
     QPushButton* rmButton;
     QString getName();
     int getWeight();
+    void setName(QString text);
+    void setWeight(int w);
 private:
     QLineEdit* taskName;
     QSpinBox* taskWeight;

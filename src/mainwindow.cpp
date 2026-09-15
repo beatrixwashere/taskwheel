@@ -23,6 +23,8 @@
 #include "mainwindow.h"
 #include "taskentry.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QString()) {
     setupWindow();
     taskTime = new QTimer(this);
@@ -34,6 +36,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QStrin
 }
 
 MainWindow::~MainWindow() {
+    /*
     taskList->hide();
     delete taskScroll;
     delete taskList;
@@ -42,13 +45,11 @@ MainWindow::~MainWindow() {
         delete te;
     }
     delete newTask;
-    delete textArea;
     delete taskTime;
+    */
 }
 
 void MainWindow::setupActions() {
-    using namespace Qt::Literals::StringLiterals;
-
     QAction* spinAction = makeAction(i18n("&Spin"), QIcon::fromTheme(QIcon::ThemeIcon::Printer), u"Spin"_s, Qt::ALT | Qt::Key_S);
     QAction* checkAction = makeAction(i18n("&Check"), QIcon::fromTheme(QIcon::ThemeIcon::CameraVideo), u"Check"_s, Qt::ALT | Qt::Key_C);
     QAction* pauseAction = makeAction(i18n("&Pause"), QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackPause), u"Pause"_s, Qt::ALT | Qt::Key_P);
@@ -75,10 +76,8 @@ void MainWindow::setupWindow() {
 
     newTask = new QPushButton(i18n("new task"), this);
     connect(newTask, &QPushButton::clicked, this, &MainWindow::addTask);
-    textArea = new KTextEdit();
 
     taskLayout->addWidget(newTask);
-    taskLayout->addWidget(textArea);
     addTask();
 
     taskList->setLayout(taskLayout);
@@ -90,13 +89,37 @@ void MainWindow::setupWindow() {
     taskScroll->setWidgetResizable(true);
 }
 
-void MainWindow::addTask() {
+TaskEntry* MainWindow::addTask() {
     TaskEntry* task = new TaskEntry();
     task->rmButton = new QPushButton(i18n("remove"));
     connect(task->rmButton, &QPushButton::clicked, this, [this, task]{removeTask(task);});
     task->layout->addWidget(task->rmButton);
     taskEntries.push_back(task);
     taskLayout->insertWidget(taskEntries.size() - 1, task->container);
+    return task;
+}
+
+void MainWindow::createList(QString text) {
+    while(taskEntries.size() > 0) {
+        removeTask(taskEntries[0]);
+    }
+
+    std::string txt = text.toStdString();
+    std::stringstream ss(txt);
+
+    for(std::string token; std::getline(ss, token);) {
+        std::size_t pos = token.find(' ');
+        if(pos == -1) {
+            continue;
+        }
+
+        std::string taskName = token.substr(0, pos);
+        int taskWeight = stoi(token.substr(pos));
+
+        TaskEntry* te = addTask();
+        te->setName(QString::fromStdString(taskName));
+        te->setWeight(taskWeight);
+    }
 }
 
 QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequence keys) {
@@ -109,7 +132,9 @@ QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequ
 }
 
 void MainWindow::removeTask(TaskEntry* task) {
-    taskEntries.erase(std::find(taskEntries.begin(), taskEntries.end(), task));
+    if(std::find(taskEntries.begin(), taskEntries.end(), task) != taskEntries.end()) {
+        taskEntries.erase(std::find(taskEntries.begin(), taskEntries.end(), task));
+    }
     taskLayout->removeWidget(task->container);
     delete task;
 }
@@ -130,7 +155,7 @@ void MainWindow::checkTimer() {
 
 void MainWindow::newFile() {
     fileName.clear();
-    textArea->clear();
+    createList(u" 0"_s);
 }
 
 void MainWindow::openFile() {
@@ -196,8 +221,13 @@ void MainWindow::saveFileToDisk(const QString& outputFileName) {
         QSaveFile file(outputFileName);
         file.open(QIODevice::WriteOnly);
 
+        QString output = u""_s;
+        for(TaskEntry* te : taskEntries) {
+            output += te->getName() + u" "_s + QString::number(te->getWeight()) + u"\n"_s;
+        }
+
         QByteArray outputByteArray;
-        outputByteArray.append(textArea->toPlainText().toUtf8());
+        outputByteArray.append(output.toUtf8());
 
         file.write(outputByteArray);
         file.commit();
@@ -220,26 +250,17 @@ void MainWindow::spinWheel() {
         }
     }
 
-    std::string txt = textArea->toPlainText().toStdString();
-    std::stringstream ss(txt);
-    std::vector<std::string> tasks;
-
-    for(std::string token; std::getline(ss, token);) {
-        std::size_t pos = token.find(' ');
-        if(pos == -1) {
-            continue;
-        }
-        std::string taskName = token.substr(0, pos);
-        int taskWeight = stoi(token.substr(pos));
-        while(taskWeight--) {
-            tasks.push_back(taskName);
+    std::vector<QString> tasks;
+    for(TaskEntry* te : taskEntries) {
+        for(int i = 0; i < te->getWeight(); i++) {
+            tasks.push_back(te->getName());
         }
     }
 
     QString selection;
     srand(time(NULL));
     if(tasks.size() > 0) {
-        selection = QString::fromStdString(tasks[rand() % tasks.size()]);
+        selection = tasks[rand() % tasks.size()];
     } else {
         selection = i18n("failed to select task");
     }
@@ -291,7 +312,7 @@ void MainWindow::downloadFinished(KJob* job) {
     const KIO::StoredTransferJob* storedJob = qobject_cast<KIO::StoredTransferJob*>(job);
 
     if(storedJob) {
-        textArea->setPlainText(QTextStream(storedJob->data(), QIODevice::ReadOnly).readAll());
+        createList(QTextStream(storedJob->data(), QIODevice::ReadOnly).readAll());
     }
 }
 
@@ -311,7 +332,7 @@ void MainWindow::unsavedChanges() {
 
 void MainWindow::quitApplication() {
     qApp->quit();
-    delete this;
+    //delete this;
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {

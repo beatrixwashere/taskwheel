@@ -25,12 +25,11 @@ private:
     QVBoxLayout* taskLayout;
     std::vector<TaskEntry*> taskEntries;
     QPushButton* newTask;
-    KTextEdit* textArea;
     QString fileName;
     QTimer* taskTime;
     int secondsLeft;
     bool cancelQuit;
-    void addTask();
+    TaskEntry* addTask();
     void createList(QString text);
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
     void removeTask(TaskEntry* task);
