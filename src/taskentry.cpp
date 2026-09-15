@@ -10,8 +10,10 @@ TaskEntry::TaskEntry() {
     layout = new QHBoxLayout();
     taskName = new QLineEdit();
     taskWeight = new QSpinBox();
+
     layout->addWidget(taskName);
     layout->addWidget(taskWeight);
+    
     container->setLayout(layout);
     container->setMinimumSize(960, 30);
     container->show();

@@ -27,9 +27,11 @@ using namespace Qt::Literals::StringLiterals;
 
 MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QString()) {
     setupWindow();
+
     taskTime = new QTimer(this);
     secondsLeft = 0;
     cancelQuit = false;
+
     connect(taskTime, &QTimer::timeout, this, &MainWindow::updateTimer);
     setCentralWidget(taskScroll);
     setupActions();
@@ -91,9 +93,13 @@ void MainWindow::setupWindow() {
 
 TaskEntry* MainWindow::addTask() {
     TaskEntry* task = new TaskEntry();
+
+    // connect remove button
     task->rmButton = new QPushButton(i18n("remove"));
     connect(task->rmButton, &QPushButton::clicked, this, [this, task]{removeTask(task);});
     task->layout->addWidget(task->rmButton);
+
+    // add to layout
     taskEntries.push_back(task);
     taskLayout->insertWidget(taskEntries.size() - 1, task->container);
     return task;
@@ -107,6 +113,7 @@ void MainWindow::createList(QString text) {
     std::string txt = text.toStdString();
     std::stringstream ss(txt);
 
+    // convert each line to taskentry
     for(std::string token; std::getline(ss, token);) {
         std::size_t pos = token.find(' ');
         if(pos == -1) {
@@ -132,6 +139,7 @@ QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequ
 }
 
 void MainWindow::removeTask(TaskEntry* task) {
+    // find task in entries and erase
     if(std::find(taskEntries.begin(), taskEntries.end(), task) != taskEntries.end()) {
         taskEntries.erase(std::find(taskEntries.begin(), taskEntries.end(), task));
     }
@@ -221,11 +229,13 @@ void MainWindow::saveFileToDisk(const QString& outputFileName) {
         QSaveFile file(outputFileName);
         file.open(QIODevice::WriteOnly);
 
+        // write tasks to text file
         QString output = u""_s;
         for(TaskEntry* te : taskEntries) {
             output += te->getName() + u" "_s + QString::number(te->getWeight()) + u"\n"_s;
         }
 
+        // convert text to utf
         QByteArray outputByteArray;
         outputByteArray.append(output.toUtf8());
 
@@ -237,6 +247,7 @@ void MainWindow::saveFileToDisk(const QString& outputFileName) {
 }
 
 void MainWindow::spinWheel() {
+    // prevent timer overlap
     if(taskTime->isActive()) {
         auto messageBox = KMessageBox::questionTwoActions(
             nullptr,
@@ -250,6 +261,7 @@ void MainWindow::spinWheel() {
         }
     }
 
+    // set up task selection list
     std::vector<QString> tasks;
     for(TaskEntry* te : taskEntries) {
         for(int i = 0; i < te->getWeight(); i++) {
@@ -257,6 +269,7 @@ void MainWindow::spinWheel() {
         }
     }
 
+    // randomly select task based on time
     QString selection;
     srand(time(NULL));
     if(tasks.size() > 0) {
