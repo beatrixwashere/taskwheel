@@ -56,11 +56,13 @@ void MainWindow::setupActions() {
     QAction* checkAction = makeAction(i18n("&Check"), QIcon::fromTheme(QIcon::ThemeIcon::CameraVideo), u"Check"_s, Qt::ALT | Qt::Key_C);
     QAction* pauseAction = makeAction(i18n("&Pause"), QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackPause), u"Pause"_s, Qt::ALT | Qt::Key_P);
     QAction* resumeAction = makeAction(i18n("&Resume"), QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackStart), u"Resume"_s, Qt::ALT | Qt::Key_R);
+    QAction* stopAction = makeAction(i18n("&Stop"), QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackStop), u"Stop"_s, Qt::ALT | Qt::Key_T);
 
     connect(spinAction, &QAction::triggered, this, &MainWindow::spinWheel);
     connect(checkAction, &QAction::triggered, this, &MainWindow::checkTimer);
     connect(pauseAction, &QAction::triggered, this, &MainWindow::pauseTimer);
     connect(resumeAction, &QAction::triggered, this, &MainWindow::resumeTimer);
+    connect(stopAction, &QAction::triggered, this, &MainWindow::stopTimer);
 
     KStandardAction::quit(this, &MainWindow::quitApplication, actionCollection());
     KStandardAction::open(this, &MainWindow::openFile, actionCollection());

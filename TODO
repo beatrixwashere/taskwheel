@@ -1,5 +1,7 @@
+- add options framework
 - add system tray option
 - detect when there's unsaved changes
 - add decrement option
 - add more rules to wheel logic
 - get craft working
+- better memory handling

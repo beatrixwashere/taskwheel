@@ -37,7 +37,6 @@ private:
     void setupWindow();
     void saveFileToDisk(const QString& outputFileName);
     void startTimer();
-    void stopTimer();
     void updateTimer();
     void unsavedChanges();
 private Q_SLOTS:
@@ -49,6 +48,7 @@ private Q_SLOTS:
     void saveFile();
     void saveFileAs();
     void spinWheel();
+    void stopTimer();
     void downloadFinished(KJob* job);
     void quitApplication();
 protected:

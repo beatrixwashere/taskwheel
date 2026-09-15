@@ -12,6 +12,7 @@
       <Action name="Check" />
       <Action name="Pause" />
       <Action name="Resume" />
+      <Action name="Stop" />
     </Menu>
   </MenuBar>
 
