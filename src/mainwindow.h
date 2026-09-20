@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
  
 #include <KXmlGuiWindow>
+#include <QSystemTrayIcon>
 #include <vector>
 #include "taskentry.h"
 
@@ -25,6 +26,7 @@ private:
     QVBoxLayout* taskLayout;
     std::vector<TaskEntry*> taskEntries;
     QPushButton* newTask;
+    QSystemTrayIcon* systray;
     QString fileName;
     QTimer* taskTime;
     int secondsLeft;
@@ -37,6 +39,7 @@ private:
     void setupWindow();
     void saveFileToDisk(const QString& outputFileName);
     void startTimer();
+    void trayClicked(QSystemTrayIcon::ActivationReason reason);
     void updateTimer();
     void unsavedChanges();
 private Q_SLOTS:

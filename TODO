@@ -1,7 +1,10 @@
 - add options framework
-- add system tray option
 - detect when there's unsaved changes
+- prompt save when opening other wheel
+- improve system tray
 - add decrement option
+- fix gui with many tasks
 - add more rules to wheel logic
 - get craft working
 - better memory handling
+- images on tasks

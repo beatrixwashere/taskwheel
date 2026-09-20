@@ -2,6 +2,7 @@
 #include <QHBoxLayout>
 #include <QSpinBox>
 #include <QPushButton>
+#include <QCheckBox>
 #include <KLocalizedString>
 #include "taskentry.h"
 
@@ -10,7 +11,9 @@ TaskEntry::TaskEntry() {
     layout = new QHBoxLayout();
     taskName = new QLineEdit();
     taskWeight = new QSpinBox();
+    taskActive = new QCheckBox();
 
+    layout->addWidget(taskActive);
     layout->addWidget(taskName);
     layout->addWidget(taskWeight);
     
@@ -28,6 +31,10 @@ TaskEntry::~TaskEntry() {
     delete taskWeight;
     delete rmButton;
     */
+}
+
+bool TaskEntry::getActive() {
+    return taskActive->isChecked();
 }
 
 QString TaskEntry::getName() {

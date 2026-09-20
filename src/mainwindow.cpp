@@ -11,6 +11,7 @@
 #include <QSpinBox>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QSystemTrayIcon>
 #include <KTextEdit>
 #include <KLocalizedString>
 #include <KActionCollection>
@@ -91,6 +92,13 @@ void MainWindow::setupWindow() {
     taskScroll->setWidget(taskList);
     taskScroll->setAlignment(Qt::AlignHCenter);
     taskScroll->setWidgetResizable(true);
+
+    setWindowIcon(QIcon(u"img/steamhappy.png"_s));
+
+    systray = new QSystemTrayIcon(QIcon(u"img/steamhappy.png"_s));
+    systray->setVisible(true);
+    systray->setToolTip(i18n("taskwheel"));
+    connect(systray, &QSystemTrayIcon::activated, this, &MainWindow::trayClicked);
 }
 
 TaskEntry* MainWindow::addTask() {
@@ -266,8 +274,10 @@ void MainWindow::spinWheel() {
     // set up task selection list
     std::vector<QString> tasks;
     for(TaskEntry* te : taskEntries) {
-        for(int i = 0; i < te->getWeight(); i++) {
+        if(te->getActive()) {
+            for(int i = 0; i < te->getWeight(); i++) {
             tasks.push_back(te->getName());
+        }
         }
     }
 
@@ -308,6 +318,14 @@ void MainWindow::stopTimer() {
         nullptr,
         i18n("timer finished!"),
         i18n("timer"));
+}
+
+void MainWindow::trayClicked(QSystemTrayIcon::ActivationReason reason) {
+    if(reason == QSystemTrayIcon::Trigger) {
+        show();
+    } else if(reason == QSystemTrayIcon::MiddleClick) {
+        hide();
+    }
 }
 
 void MainWindow::updateTimer() {
