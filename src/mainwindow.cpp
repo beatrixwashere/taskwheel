@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSystemTrayIcon>
+#include <QMenu>
 #include <KTextEdit>
 #include <KLocalizedString>
 #include <KActionCollection>
@@ -28,6 +29,7 @@ using namespace Qt::Literals::StringLiterals;
 
 MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QString()) {
     setupWindow();
+    setupTray();
 
     taskTime = new QTimer(this);
     secondsLeft = 0;
@@ -71,7 +73,23 @@ void MainWindow::setupActions() {
     KStandardAction::saveAs(this, &MainWindow::saveFileAs, actionCollection());
     KStandardAction::openNew(this, &MainWindow::newFile, actionCollection());
 
+    QMenu* trayMenu = new QMenu();
+    trayMenu->addAction(spinAction);
+    trayMenu->addAction(checkAction);
+    trayMenu->addAction(pauseAction);
+    trayMenu->addAction(resumeAction);
+    trayMenu->addAction(stopAction);
+    systray->setContextMenu(trayMenu);
+
     setupGUI(Default, u"taskwheelui.rc"_s);
+}
+
+void MainWindow::setupTray() {
+    systray = new QSystemTrayIcon(QIcon(u"img/steamhappy.png"_s));
+    systray->setVisible(true);
+    systray->setToolTip(i18n("taskwheel"));
+
+    connect(systray, &QSystemTrayIcon::activated, this, &MainWindow::trayClicked);
 }
 
 void MainWindow::setupWindow() {
@@ -94,11 +112,6 @@ void MainWindow::setupWindow() {
     taskScroll->setWidgetResizable(true);
 
     setWindowIcon(QIcon(u"img/steamhappy.png"_s));
-
-    systray = new QSystemTrayIcon(QIcon(u"img/steamhappy.png"_s));
-    systray->setVisible(true);
-    systray->setToolTip(i18n("taskwheel"));
-    connect(systray, &QSystemTrayIcon::activated, this, &MainWindow::trayClicked);
 }
 
 TaskEntry* MainWindow::addTask() {
@@ -177,6 +190,7 @@ void MainWindow::newFile() {
 }
 
 void MainWindow::openFile() {
+    unsavedChanges();
     openFileFromUrl(QFileDialog::getOpenFileUrl(this, i18n("open file")));
 }
 
@@ -272,12 +286,12 @@ void MainWindow::spinWheel() {
     }
 
     // set up task selection list
-    std::vector<QString> tasks;
+    std::vector<TaskEntry*> tasks;
     for(TaskEntry* te : taskEntries) {
         if(te->getActive()) {
             for(int i = 0; i < te->getWeight(); i++) {
-            tasks.push_back(te->getName());
-        }
+                tasks.push_back(te);
+            }
         }
     }
 
@@ -285,7 +299,9 @@ void MainWindow::spinWheel() {
     QString selection;
     srand(time(NULL));
     if(tasks.size() > 0) {
-        selection = tasks[rand() % tasks.size()];
+        int idx = rand() % tasks.size();
+        selection = tasks[idx]->getName();
+        tasks[idx]->setWeight(tasks[idx]->getWeight() - 1);
     } else {
         selection = i18n("failed to select task");
     }
@@ -295,7 +311,7 @@ void MainWindow::spinWheel() {
         selection,
         i18n("selected task"),
         KStandardGuiItem::ok(), KStandardGuiItem::cancel());
-    if(messageBox == KMessageBox::PrimaryAction) {
+    if(messageBox == KMessageBox::PrimaryAction && tasks.size() > 0) {
         startTimer();
     }
 }
