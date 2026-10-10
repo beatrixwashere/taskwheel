@@ -22,9 +22,9 @@ public:
     void setName(QString text);
     void setWeight(int w);
 private:
+    QCheckBox* taskActive;
     QLineEdit* taskName;
     QSpinBox* taskWeight;
-    QCheckBox* taskActive;
 };
 
 #endif // TASKENTRY_H

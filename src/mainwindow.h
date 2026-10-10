@@ -4,7 +4,9 @@
 #include <KXmlGuiWindow>
 #include <QSystemTrayIcon>
 #include <vector>
+#include <unordered_map>
 #include "taskentry.h"
+#include "settingsentry.h"
 
 class KTextEdit;
 class KJob;
@@ -13,6 +15,7 @@ class QCloseEvent;
 class QVBoxLayout;
 class QPushButton;
 class QScrollArea;
+class QVariant;
 
 class MainWindow : public KXmlGuiWindow {
     Q_OBJECT
@@ -27,6 +30,9 @@ private:
     std::vector<TaskEntry*> taskEntries;
     QPushButton* newTask;
     QSystemTrayIcon* systray;
+    QWidget* settingsList;
+    QVBoxLayout* settingsLayout;
+    std::unordered_map<QString, SettingsEntry*> settingsEntries;
     QString fileName;
     QTimer* taskTime;
     int secondsLeft;
@@ -34,8 +40,10 @@ private:
     TaskEntry* addTask();
     void createList(QString text);
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
+    void openSettings();
     void removeTask(TaskEntry* task);
     void setupActions();
+    void setupSettings();
     void setupTray();
     void setupWindow();
     void saveFileToDisk(const QString& outputFileName);
@@ -43,6 +51,7 @@ private:
     void trayClicked(QSystemTrayIcon::ActivationReason reason);
     void updateTimer();
     void unsavedChanges();
+    void writeSetting(QString name);
 private Q_SLOTS:
     void checkTimer();
     void newFile();

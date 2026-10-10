@@ -35,6 +35,8 @@ target_sources(taskwheel
     src/main.cpp
     src/mainwindow.cpp
     src/taskentry.cpp
+    src/settingsentry.cpp
+    src/settings.cpp
 )
 
 target_link_libraries(taskwheel

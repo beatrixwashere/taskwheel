@@ -1,9 +1,6 @@
-- add options framework
-- detect when there's unsaved changes
+- autosave option
 - improve system tray
-- add decrement option
 - fix gui with many tasks
-- add more rules to wheel logic
 - get craft working
 - better memory handling
 - images on tasks

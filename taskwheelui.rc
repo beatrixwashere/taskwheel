@@ -13,6 +13,7 @@
       <Action name="Pause" />
       <Action name="Resume" />
       <Action name="Stop" />
+      <Action name="Settings" />
     </Menu>
   </MenuBar>
 

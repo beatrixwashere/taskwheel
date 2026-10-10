@@ -9,10 +9,13 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSpinBox>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSystemTrayIcon>
 #include <QMenu>
+#include <QSettings>
+#include <QVariant>
 #include <KTextEdit>
 #include <KLocalizedString>
 #include <KActionCollection>
@@ -22,14 +25,20 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <unordered_map>
 #include "mainwindow.h"
 #include "taskentry.h"
+#include "settingsentry.h"
+#include "settings.h"
 
 using namespace Qt::Literals::StringLiterals;
 
 MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QString()) {
     setupWindow();
     setupTray();
+
+    Settings::read();
+    setupSettings();
 
     taskTime = new QTimer(this);
     secondsLeft = 0;
@@ -60,12 +69,14 @@ void MainWindow::setupActions() {
     QAction* pauseAction = makeAction(i18n("&Pause"), QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackPause), u"Pause"_s, Qt::ALT | Qt::Key_P);
     QAction* resumeAction = makeAction(i18n("&Resume"), QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackStart), u"Resume"_s, Qt::ALT | Qt::Key_R);
     QAction* stopAction = makeAction(i18n("&Stop"), QIcon::fromTheme(QIcon::ThemeIcon::MediaPlaybackStop), u"Stop"_s, Qt::ALT | Qt::Key_T);
+    QAction* settingsAction = makeAction(i18n("&Settings"), QIcon::fromTheme(QIcon::ThemeIcon::MediaRecord), u"Settings"_s, Qt::ALT | Qt::Key_G);
 
     connect(spinAction, &QAction::triggered, this, &MainWindow::spinWheel);
     connect(checkAction, &QAction::triggered, this, &MainWindow::checkTimer);
     connect(pauseAction, &QAction::triggered, this, &MainWindow::pauseTimer);
     connect(resumeAction, &QAction::triggered, this, &MainWindow::resumeTimer);
     connect(stopAction, &QAction::triggered, this, &MainWindow::stopTimer);
+    connect(settingsAction, &QAction::triggered, this, &MainWindow::openSettings);
 
     KStandardAction::quit(this, &MainWindow::quitApplication, actionCollection());
     KStandardAction::open(this, &MainWindow::openFile, actionCollection());
@@ -79,9 +90,30 @@ void MainWindow::setupActions() {
     trayMenu->addAction(pauseAction);
     trayMenu->addAction(resumeAction);
     trayMenu->addAction(stopAction);
+    trayMenu->addAction(settingsAction);
     systray->setContextMenu(trayMenu);
 
     setupGUI(Default, u"taskwheelui.rc"_s);
+}
+
+void MainWindow::setupSettings() {
+    settingsList = new QWidget();
+    settingsLayout = new QVBoxLayout();
+
+    for(QString s : Settings::getKeys()) {
+        bool num = Settings::types[s] == u"int"_s;
+        settingsEntries[s] = new SettingsEntry(s, num);
+        settingsEntries[s]->setVal(Settings::get(s));
+        if(num) {
+            connect(settingsEntries[s]->settingValue, &QSpinBox::valueChanged, this, [this, s]{writeSetting(s);});
+        } else {
+            connect(settingsEntries[s]->settingCheck, &QCheckBox::checkStateChanged, this, [this, s]{writeSetting(s);});
+        }
+        settingsLayout->addWidget(settingsEntries[s]->container);
+    }
+
+    settingsList->setLayout(settingsLayout);
+    settingsList->hide();
 }
 
 void MainWindow::setupTray() {
@@ -139,7 +171,7 @@ void MainWindow::createList(QString text) {
     // convert each line to taskentry
     for(std::string token; std::getline(ss, token);) {
         std::size_t pos = token.find(' ');
-        if(pos == -1) {
+        if(pos == std::string::npos) {
             continue;
         }
 
@@ -189,6 +221,10 @@ void MainWindow::newFile() {
     createList(u" 0"_s);
 }
 
+void MainWindow::openSettings() {
+    settingsList->show();
+}
+
 void MainWindow::openFile() {
     unsavedChanges();
     openFileFromUrl(QFileDialog::getOpenFileUrl(this, i18n("open file")));
@@ -220,7 +256,7 @@ void MainWindow::pauseTimer() {
 }
 
 void MainWindow::resumeTimer() {
-    if(secondsLeft == 0) {
+    if(secondsLeft == 0 || taskTime->isActive()) {
         KMessageBox::information(
             nullptr,
             i18n("no timer to resume"),
@@ -301,7 +337,9 @@ void MainWindow::spinWheel() {
     if(tasks.size() > 0) {
         int idx = rand() % tasks.size();
         selection = tasks[idx]->getName();
-        tasks[idx]->setWeight(tasks[idx]->getWeight() - 1);
+        if(Settings::get(u"tasks/decrement"_s).toBool()) {
+            tasks[idx]->setWeight(tasks[idx]->getWeight() - 1);
+        }
     } else {
         selection = i18n("failed to select task");
     }
@@ -317,7 +355,7 @@ void MainWindow::spinWheel() {
 }
 
 void MainWindow::startTimer() {
-    secondsLeft = 600;
+    secondsLeft = Settings::get(u"timer/length"_s).toInt();
     taskTime->start(1000);
 
     KMessageBox::information(
@@ -379,6 +417,10 @@ void MainWindow::unsavedChanges() {
     }
 }
 
+void MainWindow::writeSetting(QString name) {
+    Settings::set(name, settingsEntries[name]->getVal());
+}
+
 void MainWindow::quitApplication() {
     qApp->quit();
     //delete this;
@@ -390,6 +432,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         event->ignore();
         cancelQuit = false;
     } else {
+        Settings::write();
         event->accept();
     }
 }
