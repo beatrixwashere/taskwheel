@@ -376,9 +376,7 @@ void MainWindow::stopTimer() {
 
 void MainWindow::trayClicked(QSystemTrayIcon::ActivationReason reason) {
     if(reason == QSystemTrayIcon::Trigger) {
-        show();
-    } else if(reason == QSystemTrayIcon::MiddleClick) {
-        hide();
+        setVisible(!isVisible());
     }
 }
 
@@ -404,6 +402,11 @@ void MainWindow::downloadFinished(KJob* job) {
 }
 
 void MainWindow::unsavedChanges() {
+    if(Settings::get(u"tasks/saveOnClose"_s).toBool()) {
+        saveFile();
+        return;
+    }
+
     auto messageBox = KMessageBox::questionTwoActionsCancel(
         nullptr,
         i18n("save before closing?"),
