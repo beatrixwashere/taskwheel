@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QStrin
     taskTime = new QTimer(this);
     secondsLeft = 0;
     cancelQuit = false;
+    fullQuit = false;
 
     connect(taskTime, &QTimer::timeout, this, &MainWindow::updateTimer);
     setCentralWidget(taskScroll);
@@ -426,14 +427,23 @@ void MainWindow::writeSetting(QString name) {
 
 void MainWindow::quitApplication() {
     qApp->quit();
+    fullQuit = true;
     //delete this;
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
+    // TODO: system tray enabled option
+    if(!fullQuit) {
+        setVisible(!isVisible());
+        event->ignore();
+        return;
+    }
+
     unsavedChanges();
     if(cancelQuit) {
         event->ignore();
         cancelQuit = false;
+        fullQuit = false;
     } else {
         Settings::write();
         event->accept();

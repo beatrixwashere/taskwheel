@@ -37,6 +37,7 @@ private:
     QTimer* taskTime;
     int secondsLeft;
     bool cancelQuit;
+    bool fullQuit;
     TaskEntry* addTask();
     void createList(QString text);
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
