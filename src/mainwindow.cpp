@@ -35,10 +35,10 @@ using namespace Qt::Literals::StringLiterals;
 
 MainWindow::MainWindow(QWidget* parent) : KXmlGuiWindow(parent), fileName(QString()) {
     setupWindow();
-    setupTray();
 
     Settings::read();
     setupSettings();
+    setupTray();
 
     taskTime = new QTimer(this);
     secondsLeft = 0;
@@ -119,6 +119,12 @@ void MainWindow::setupSettings() {
 
 void MainWindow::setupTray() {
     systray = new QSystemTrayIcon(QIcon(u"img/steamhappy.png"_s));
+
+    if(!Settings::get(u"systray/enabled"_s).toBool()) {
+        systray->setVisible(false);
+        return;
+    }
+
     systray->setVisible(true);
     systray->setToolTip(i18n("taskwheel"));
 
@@ -361,7 +367,7 @@ void MainWindow::startTimer() {
 
     KMessageBox::information(
         nullptr,
-        i18n("started 10 minute timer"),
+        i18n("started timer for ") + QString::number(Settings::get(u"timer/length"_s).toInt()) + i18n("seconds"),
         i18n("timer"));
 }
 
@@ -432,8 +438,7 @@ void MainWindow::quitApplication() {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
-    // TODO: system tray enabled option
-    if(!fullQuit) {
+    if(!fullQuit && Settings::get(u"systray/enabled"_s).toBool()) {
         setVisible(!isVisible());
         event->ignore();
         return;

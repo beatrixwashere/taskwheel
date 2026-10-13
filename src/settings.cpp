@@ -33,8 +33,9 @@ void Settings::read() {
 void Settings::reset() {
     settings.clear();
     auto f = [](QString s, QVariant val, QString t){set(s, val); types[s] = t;};
-    f(u"tasks/saveOnClose"_s, false, u"bool"_s);
+    f(u"systray/enabled"_s, true, u"bool"_s);
     f(u"tasks/decrement"_s, true, u"bool"_s);
+    f(u"tasks/saveOnClose"_s, false, u"bool"_s);
     f(u"timer/length"_s, 600, u"int"_s);
 }
 
