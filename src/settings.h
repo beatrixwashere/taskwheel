@@ -9,6 +9,7 @@ class QVariant;
 class Settings {
 public:
     static std::unordered_map<QString, QString> types;
+    static std::unordered_map<QString, QString> names;
     static QVariant get(QString name);
     static QStringList getKeys();
     static void read();

@@ -1,5 +1,6 @@
 #include <QSettings>
 #include <QVariant>
+#include <KLocalizedString>
 #include <KMessageBox>
 #include "settings.h"
 
@@ -7,6 +8,7 @@ using namespace Qt::Literals::StringLiterals;
 
 std::unordered_map<QString, QVariant> Settings::settings = {};
 std::unordered_map<QString, QString> Settings::types = {};
+std::unordered_map<QString, QString> Settings::names = {};
 
 QVariant Settings::get(QString name) {
     return settings[name];
@@ -32,11 +34,11 @@ void Settings::read() {
 
 void Settings::reset() {
     settings.clear();
-    auto f = [](QString s, QVariant val, QString t){set(s, val); types[s] = t;};
-    f(u"systray/enabled"_s, true, u"bool"_s);
-    f(u"tasks/decrement"_s, true, u"bool"_s);
-    f(u"tasks/saveOnClose"_s, false, u"bool"_s);
-    f(u"timer/length"_s, 600, u"int"_s);
+    auto f = [](QString s, QVariant val, QString t, QString n){set(s, val); types[s] = t; names[s] = n;};
+    f(u"systray/enabled"_s, true, u"bool"_s, i18n("system tray: enabled"));
+    f(u"tasks/decrement"_s, true, u"bool"_s, i18n("tasks: decrement"));
+    f(u"tasks/saveOnClose"_s, false, u"bool"_s, i18n("tasks: save on close"));
+    f(u"timer/length"_s, 600, u"int"_s, i18n("timer: length (seconds)"));
 }
 
 void Settings::set(QString name, QVariant val) {

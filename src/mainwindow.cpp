@@ -103,7 +103,7 @@ void MainWindow::setupSettings() {
 
     for(QString s : Settings::getKeys()) {
         bool num = Settings::types[s] == u"int"_s;
-        settingsEntries[s] = new SettingsEntry(s, num);
+        settingsEntries[s] = new SettingsEntry(Settings::names[s], num);
         settingsEntries[s]->setVal(Settings::get(s));
         if(num) {
             connect(settingsEntries[s]->settingValue, &QSpinBox::valueChanged, this, [this, s]{writeSetting(s);});
@@ -256,6 +256,9 @@ void MainWindow::pauseTimer() {
     }
 
     taskTime->stop();
+
+    systray->setIcon(QIcon(u"img/steamhappy_pause.png"_s));
+
     KMessageBox::information(
         nullptr,
         QString::fromStdString("timer paused at " + std::to_string(secondsLeft) + " seconds"),
@@ -272,6 +275,8 @@ void MainWindow::resumeTimer() {
     }
 
     taskTime->start(1000);
+
+    systray->setIcon(QIcon(u"img/steamhappy_play.png"_s));
 
     KMessageBox::information(
         nullptr,
@@ -365,15 +370,19 @@ void MainWindow::startTimer() {
     secondsLeft = Settings::get(u"timer/length"_s).toInt();
     taskTime->start(1000);
 
+    systray->setIcon(QIcon(u"img/steamhappy_play.png"_s));
+
     KMessageBox::information(
         nullptr,
-        i18n("started timer for ") + QString::number(Settings::get(u"timer/length"_s).toInt()) + i18n("seconds"),
+        i18n("started timer for ") + QString::number(Settings::get(u"timer/length"_s).toInt()) + i18n(" seconds"),
         i18n("timer"));
 }
 
 void MainWindow::stopTimer() {
     taskTime->stop();
     secondsLeft = 0;
+
+    systray->setIcon(QIcon(u"img/steamhappy.png"_s));
 
     KMessageBox::information(
         nullptr,
