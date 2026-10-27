@@ -1,3 +1,4 @@
+.flatpak-builder
 .vscode
 build.sh
 compile_commands.json
