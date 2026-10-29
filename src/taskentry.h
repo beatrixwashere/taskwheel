@@ -15,6 +15,8 @@ public:
     ~TaskEntry();
     QWidget* container;
     QHBoxLayout* layout;
+    QPushButton* moveUpButton;
+    QPushButton* moveDownButton;
     QPushButton* rmButton;
     bool getActive();
     QString getName();

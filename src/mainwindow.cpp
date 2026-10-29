@@ -168,9 +168,17 @@ void MainWindow::setupWindow() {
 TaskEntry* MainWindow::addTask() {
     TaskEntry* task = new TaskEntry();
 
-    // connect remove button
+    // create and connect buttons
+    task->moveUpButton = new QPushButton(u"↑"_s);
+    task->moveDownButton = new QPushButton(u"↓"_s);
     task->rmButton = new QPushButton(i18n("remove"));
+
+    connect(task->moveUpButton, &QPushButton::clicked, this, [this, task]{moveTask(task, -1);});
+    connect(task->moveDownButton, &QPushButton::clicked, this, [this, task]{moveTask(task, 1);});
     connect(task->rmButton, &QPushButton::clicked, this, [this, task]{removeTask(task);});
+
+    task->layout->addWidget(task->moveUpButton);
+    task->layout->addWidget(task->moveDownButton);
     task->layout->addWidget(task->rmButton);
 
     // add to layout
@@ -216,6 +224,23 @@ QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequ
     actionCollection()->addAction(name, action);
     actionCollection()->setDefaultShortcut(action, keys);
     return action;
+}
+
+void MainWindow::moveTask(TaskEntry* task, int delta) {
+    int idx = taskLayout->indexOf(task->container);
+
+    taskEntries.erase(taskEntries.begin() + idx);
+
+    idx += delta;
+    if(idx < 0) {
+        idx = 0;
+    } else if(idx >= (int)taskEntries.size() + 1) {
+        idx = taskEntries.size();
+    }
+
+    taskLayout->removeWidget(task->container);
+    taskLayout->insertWidget(idx, task->container);
+    taskEntries.insert(taskEntries.begin() + idx, task);
 }
 
 void MainWindow::removeTask(TaskEntry* task) {

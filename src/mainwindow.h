@@ -46,6 +46,7 @@ private:
     void checkWeighted();
     void createList(QString text);
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
+    void moveTask(TaskEntry* task, int delta);
     void openSettings();
     void removeTask(TaskEntry* task);
     void resetWeights();
