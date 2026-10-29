@@ -28,7 +28,11 @@ private:
     QWidget* taskList;
     QVBoxLayout* taskLayout;
     std::vector<TaskEntry*> taskEntries;
-    QPushButton* newTask;
+    QWidget* footerButtons;
+    QHBoxLayout* footerLayout;
+    QPushButton* addTaskButton;
+    QPushButton* resetWeightsButton;
+    QPushButton* checkWeightedButton;
     QSystemTrayIcon* systray;
     QWidget* settingsList;
     QVBoxLayout* settingsLayout;
@@ -39,10 +43,12 @@ private:
     bool cancelQuit;
     bool fullQuit;
     TaskEntry* addTask();
+    void checkWeighted();
     void createList(QString text);
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
     void openSettings();
     void removeTask(TaskEntry* task);
+    void resetWeights();
     void setupActions();
     void setupSettings();
     void setupTray();

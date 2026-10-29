@@ -19,6 +19,7 @@ public:
     bool getActive();
     QString getName();
     int getWeight();
+    void setActive(bool a);
     void setName(QString text);
     void setWeight(int w);
 private:

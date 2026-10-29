@@ -59,7 +59,7 @@ MainWindow::~MainWindow() {
     for(TaskEntry* te : taskEntries) {
         delete te;
     }
-    delete newTask;
+    delete addTaskButton;
     delete taskTime;
     */
 }
@@ -135,11 +135,23 @@ void MainWindow::setupWindow() {
     taskScroll = new QScrollArea();
     taskList = new QWidget();
     taskLayout = new QVBoxLayout();
+    footerButtons = new QWidget();
+    footerLayout = new QHBoxLayout();
 
-    newTask = new QPushButton(i18n("new task"), this);
-    connect(newTask, &QPushButton::clicked, this, &MainWindow::addTask);
+    addTaskButton = new QPushButton(i18n("new task"), this);
+    resetWeightsButton = new QPushButton(i18n("reset weights"), this);
+    checkWeightedButton = new QPushButton(i18n("check tasks w/ weights"), this);
+    
+    connect(addTaskButton, &QPushButton::clicked, this, &MainWindow::addTask);
+    connect(resetWeightsButton, &QPushButton::clicked, this, &MainWindow::resetWeights);
+    connect(checkWeightedButton, &QPushButton::clicked, this, &MainWindow::checkWeighted);
 
-    taskLayout->addWidget(newTask);
+    footerLayout->addWidget(addTaskButton);
+    footerLayout->addWidget(resetWeightsButton);
+    footerLayout->addWidget(checkWeightedButton);
+
+    footerButtons->setLayout(footerLayout);
+    taskLayout->addWidget(footerButtons);
     addTask();
 
     taskList->setLayout(taskLayout);
@@ -165,6 +177,12 @@ TaskEntry* MainWindow::addTask() {
     taskEntries.push_back(task);
     taskLayout->insertWidget(taskEntries.size() - 1, task->container);
     return task;
+}
+
+void MainWindow::checkWeighted() {
+    for(TaskEntry* te : taskEntries) {
+        te->setActive(te->getWeight() > 0);
+    }
 }
 
 void MainWindow::createList(QString text) {
@@ -207,6 +225,13 @@ void MainWindow::removeTask(TaskEntry* task) {
     }
     taskLayout->removeWidget(task->container);
     delete task;
+}
+
+void MainWindow::resetWeights() {
+    for(TaskEntry* te : taskEntries) {
+        te->setWeight(0);
+        te->setActive(false);
+    }
 }
 
 void MainWindow::checkTimer() {
@@ -299,7 +324,12 @@ void MainWindow::saveFileAs() {
 void MainWindow::saveFileToDisk(const QString& outputFileName) {
     if(!outputFileName.isNull()) {
         QSaveFile file(outputFileName);
-        file.open(QIODevice::WriteOnly);
+        if(!file.open(QIODevice::WriteOnly)) {
+            KMessageBox::information(
+                nullptr,
+                i18n("failed to write to save file"),
+                i18n("save"));
+        }
 
         // write tasks to text file
         QString output = u""_s;

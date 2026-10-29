@@ -45,10 +45,14 @@ int TaskEntry::getWeight() {
     return taskWeight->value();
 }
 
+void TaskEntry::setActive(bool a) {
+    taskActive->setChecked(a);
+}
+
 void TaskEntry::setName(QString text) {
-    return taskName->setText(text);
+    taskName->setText(text);
 }
 
 void TaskEntry::setWeight(int w) {
-    return taskWeight->setValue(w);
+    taskWeight->setValue(w);
 }
