@@ -203,13 +203,9 @@ void MainWindow::createList(QString text) {
 
     // convert each line to taskentry
     for(std::string token; std::getline(ss, token);) {
-        std::size_t pos = token.find(' ');
-        if(pos == std::string::npos) {
-            continue;
-        }
-
-        std::string taskName = token.substr(0, pos);
-        int taskWeight = stoi(token.substr(pos));
+        std::string taskName = token;
+        std::getline(ss, token);
+        int taskWeight = stoi(token);
 
         TaskEntry* te = addTask();
         te->setName(QString::fromStdString(taskName));
@@ -359,7 +355,7 @@ void MainWindow::saveFileToDisk(const QString& outputFileName) {
         // write tasks to text file
         QString output = u""_s;
         for(TaskEntry* te : taskEntries) {
-            output += te->getName() + u" "_s + QString::number(te->getWeight()) + u"\n"_s;
+            output += te->getName() + u"\n"_s + QString::number(te->getWeight()) + u"\n"_s;
         }
 
         // convert text to utf
