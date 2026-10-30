@@ -45,6 +45,7 @@ private:
     TaskEntry* addTask();
     void checkWeighted();
     void createList(QString text);
+    void kInfo(QString title, QString body);
     QAction* makeAction(QString text, QIcon icon, QString name, QKeySequence keys);
     void moveTask(TaskEntry* task, int delta);
     void openSettings();

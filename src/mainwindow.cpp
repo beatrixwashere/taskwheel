@@ -213,6 +213,13 @@ void MainWindow::createList(QString text) {
     }
 }
 
+void MainWindow::kInfo(QString title, QString body) {
+    KMessageBox::information(
+        nullptr,
+        body,
+        title);
+}
+
 QAction* MainWindow::makeAction(QString text, QIcon icon, QString name, QKeySequence keys) {
     QAction* action = new QAction(this);
     action->setText(text);
@@ -263,10 +270,7 @@ void MainWindow::checkTimer() {
         timerStatus = QString::fromStdString("seconds left: " + std::to_string(secondsLeft));
     }
 
-    KMessageBox::information(
-        nullptr,
-        timerStatus,
-        i18n("timer"));
+    kInfo(i18n("timer"), timerStatus);
 }
 
 void MainWindow::newFile() {
@@ -294,10 +298,7 @@ void MainWindow::openFileFromUrl(const QUrl& inputFileName) {
 
 void MainWindow::pauseTimer() {
     if(!taskTime->isActive()) {
-        KMessageBox::information(
-            nullptr,
-            i18n("no timer to pause"),
-            i18n("timer"));
+        kInfo(i18n("timer"), i18n("no timer to pause"));
         return;
     }
 
@@ -305,18 +306,12 @@ void MainWindow::pauseTimer() {
 
     systray->setIcon(QIcon(u"img/steamhappy_pause.png"_s));
 
-    KMessageBox::information(
-        nullptr,
-        QString::fromStdString("timer paused at " + std::to_string(secondsLeft) + " seconds"),
-        i18n("timer"));
+    kInfo(i18n("timer"), QString::fromStdString("timer paused at " + std::to_string(secondsLeft) + " seconds"));
 }
 
 void MainWindow::resumeTimer() {
     if(secondsLeft == 0 || taskTime->isActive()) {
-        KMessageBox::information(
-            nullptr,
-            i18n("no timer to resume"),
-            i18n("timer"));
+        kInfo(i18n("timer"), i18n("no timer to resume"));
         return;
     }
 
@@ -324,10 +319,7 @@ void MainWindow::resumeTimer() {
 
     systray->setIcon(QIcon(u"img/steamhappy_play.png"_s));
 
-    KMessageBox::information(
-        nullptr,
-        QString::fromStdString("timer resumed at " + std::to_string(secondsLeft) + " seconds"),
-        i18n("timer"));
+    kInfo(i18n("timer"), QString::fromStdString("timer resumed at " + std::to_string(secondsLeft) + " seconds"));
 }
 
 void MainWindow::saveFile() {
@@ -346,10 +338,7 @@ void MainWindow::saveFileToDisk(const QString& outputFileName) {
     if(!outputFileName.isNull()) {
         QSaveFile file(outputFileName);
         if(!file.open(QIODevice::WriteOnly)) {
-            KMessageBox::information(
-                nullptr,
-                i18n("failed to write to save file"),
-                i18n("save"));
+            kInfo(i18n("save"), i18n("failed to write to save file"));
         }
 
         // write tasks to text file
@@ -423,10 +412,7 @@ void MainWindow::startTimer() {
 
     systray->setIcon(QIcon(u"img/steamhappy_play.png"_s));
 
-    KMessageBox::information(
-        nullptr,
-        i18n("started timer for ") + QString::number(Settings::get(u"timer/length"_s).toInt()) + i18n(" seconds"),
-        i18n("timer"));
+    kInfo(i18n("timer"), i18n("started timer for ") + QString::number(Settings::get(u"timer/length"_s).toInt()) + i18n(" seconds"));
 }
 
 void MainWindow::stopTimer() {
@@ -435,10 +421,7 @@ void MainWindow::stopTimer() {
 
     systray->setIcon(QIcon(u"img/steamhappy.png"_s));
 
-    KMessageBox::information(
-        nullptr,
-        i18n("timer finished!"),
-        i18n("timer"));
+    kInfo(i18n("timer"), i18n("timer finished!"));
 }
 
 void MainWindow::trayClicked(QSystemTrayIcon::ActivationReason reason) {
